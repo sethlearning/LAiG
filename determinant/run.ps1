@@ -17,8 +17,9 @@ if (-not $name) {
 
 if (-not ($size = $Request.Query.Size))
 {
-    $size = 10
+    $size = 3
 }
+
 
 function generateMatrix
 {
@@ -33,12 +34,84 @@ function generateMatrix
         for ($j = 0; $j -lt $size; $j++)
         {
             if ($j -eq 0) { $matrix[$i] = [array]::CreateInstance([int], $size) }
-            $matrix[$i][$j] = Get-Random -Minimum 0 -Maximum 99
+            $matrix[$i][$j] = Get-Random -Minimum 0 -Maximum 10
         }
     }
 
     return $matrix
 }
+
+function subMatrix
+{
+    Param(
+        [array]$matrix,
+        [int]$element
+    )
+
+    $size = $matrix.Length
+    
+    $subMatrix = [array]::CreateInstance([array], $size-1)
+    
+    for ($i = 1; $i -lt $size; $i++)
+    {
+        $k = 0
+        for ($j = 0; $j -lt $size; $j++)
+        {
+            if ($j -eq 0) { $subMatrix[$i-1] = [array]::CreateInstance([int], $size-1) }
+            if ($j -eq $element) { continue }
+
+            $subMatrix[$i-1][$k] = $matrix[$i][$j]
+            $k++
+        }
+    }
+
+    return $subMatrix
+}
+
+function getOne
+{
+    Param(
+        [int]$i
+    )
+
+    if ($i % 2) # i+j is odd
+    {
+        return -1
+    }
+    else
+    {
+        return 1
+    }
+}
+
+function calculateDeterminant
+{
+    Param(
+        [array]$matrix
+    )
+
+    $size = $matrix.Length
+
+    if ($size -eq 2)
+    {
+        return $matrix[0][0] * $matrix[1][1] - $matrix[0][1] * $matrix[1][0]
+    }
+    else
+    {
+        $det = 0;
+
+        for ($i = 0; $i -lt $size; $i++)
+        {
+            $one = getOne -i $i
+
+            $subMatrix = subMatrix -matrix $matrix -element $i
+            $det += $matrix[0][$i] * $one * (calculateDeterminant -matrix $subMatrix)
+        }
+    }
+    return $det
+}
+
+# Export-ModuleMember -Function calculateDeterminant, subMatrix
 
 function formatMatrix
 {
@@ -90,19 +163,9 @@ function getStyle
         </style>"
 }
 
-function calculateDeterminant
-{
-    Param(
-        [array]$matrix
-    )
 
-    $size = $matrix.Length
 
-    if ($size -le 2)
-    {
-        return
-    }
-}
+
 
 $matrix = generateMatrix -size $size
 
@@ -110,9 +173,9 @@ $Body = getStyle
 
 $Body += formatMatrix -matrix $matrix -size $size
 
-$Body += '<p>det = <span style="font-size: 1.5em">AAA</span></p>'
+$det = calculateDeterminant -matrix $matrix
 
-calculateDeterminant -matrix $matrix
+$Body += "<p>det = <span style=`"font-size: 1.5em`">$det</span></p>"
 
 # $html = ConvertTo-Html -Body $Body
 
