@@ -1,0 +1,1 @@
+Export-ModuleMember -Function calculateDeterminant, generateMatrix, subMatrix, formatMatrix, getOne, getStyle
