@@ -25,26 +25,6 @@ function calculateDeterminant
     return $det
 }
 
-function generateMatrix
-{
-    Param(
-        [int]$size
-    )
-
-    $matrix = [array]::CreateInstance([array], $size)
-
-    for ($i = 0; $i -lt $size; $i++)
-    {
-        for ($j = 0; $j -lt $size; $j++)
-        {
-            if ($j -eq 0) { $matrix[$i] = [array]::CreateInstance([int], $size) }
-            $matrix[$i][$j] = Get-Random -Minimum 0 -Maximum 99
-        }
-    }
-
-    return $matrix
-}
-
 function subMatrix
 {
     Param(
@@ -70,6 +50,26 @@ function subMatrix
     }
 
     return $subMatrix
+}
+
+function generateMatrix
+{
+    Param(
+        [int]$size
+    )
+
+    $matrix = [array]::CreateInstance([array], $size)
+
+    for ($i = 0; $i -lt $size; $i++)
+    {
+        for ($j = 0; $j -lt $size; $j++)
+        {
+            if ($j -eq 0) { $matrix[$i] = [array]::CreateInstance([int], $size) }
+            $matrix[$i][$j] = Get-Random -Minimum 0 -Maximum 99
+        }
+    }
+
+    return $matrix
 }
 
 function formatMatrix
